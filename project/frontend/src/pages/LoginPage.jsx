@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import logo from './Screenshot_2025-02-08_155703-removebg.png';
 
 const LoginPage = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
@@ -37,7 +38,7 @@ const LoginPage = ({ setIsAuthenticated }) => {
   }, []);
 
   return (
-    <div className="bodys">
+    <div className="login-page-container">
       <div
         className="login-page d-flex align-items-center justify-content-center min-vh-100"
         style={{
@@ -48,13 +49,10 @@ const LoginPage = ({ setIsAuthenticated }) => {
       >
         <div className="login-box">
           <div className="text-center mb-4">
-            <div className="logo-container mb-3">
-              <svg className="logo" viewBox="0 0 100 100" >
-                <circle cx="50" cy="50" r="45" fill="#4e73df"  />
-                <path d="M30 50 L45 65 L70 35" stroke="white" strokeWidth="8" fill="none"  />
-              </svg>
+            <div id='imm' className="logo-container mb-3">
+              <img width={200} src={logo} alt="" />
             </div>
-            <h2 className="brand-text">StockMaster</h2>
+           
           </div>
           <form onSubmit={handleLogin} className="login-form">
             <div className="form-floating mb-3">

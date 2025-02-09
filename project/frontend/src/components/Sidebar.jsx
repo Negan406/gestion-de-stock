@@ -1,9 +1,17 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import ThemeSwitcher from './ThemeSwitcher';
 import ProImage from './pro.jpg';
 
 function Sidebar({ isActive, toggleSidebar }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const username = params.get("user") || "Admin";
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    navigate("/login");
+  };
   return (
     <nav className={`sidebar bg-dark text-white pt-3 ${isActive ? 'active' : ''}`}>
       <div className="sidebar-header px-3 mb-4">
@@ -74,13 +82,24 @@ function Sidebar({ isActive, toggleSidebar }) {
         </li>
       </ul>
       <div className="sidebar-footer px-3">
-        <ThemeSwitcher />
-        <div className="d-flex justify-content-center align-items-center">
-          <i className="fas fa-sun me-2"></i>
-          <small className="text-muted">Mode Sombre</small>
-          <i className="fas fa-moon ms-2"></i>
-        </div>
+        
         <small className="text-muted d-block mt-2">Version 1.0.0</small>
+        <div id='ss' className="user-info  text-white p-2 rounded shadow mt-3">
+          <strong>Bienvenue, {username} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-fill" viewBox="0 0 16 16">
+            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+          </svg></strong>
+          <button
+            className="btn2  mt-2 w-100"
+            style={{ transition: 'background-color 0.3s ease, transform 0.3s ease' }}
+            onClick={handleLogout}
+          >
+            Logout
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-box-arrow-right ms-2" viewBox="0 0 16 16">
+              <path fillRule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
+              <path fillRule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+            </svg>
+          </button>
+        </div>
       </div>
     </nav>
   );
