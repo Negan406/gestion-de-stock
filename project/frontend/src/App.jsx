@@ -7,7 +7,6 @@ import InventoryPage from './pages/InventoryPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ClientsPage from './pages/ClientsPage';
 import SuppliersPage from './pages/SuppliersPage';
-import OnlineUsersPage from './pages/OnlineUsersPage';
 import LoginPage from './pages/LoginPage';
 import { RouteProvider } from './context/RouteContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -67,7 +66,6 @@ function App() {
                       <Route path="/clients" element={<ClientsPage />} />
                       <Route path="/suppliers" element={<SuppliersPage />} />
                       <Route path="/settings" element={<div>Settings Page (TBD)</div>} />
-                      <Route path="/users" element={<OnlineUsersPage />} />
                       <Route path="*" element={<Navigate to="/dashboard" />} />
                     </Routes>
                   </main>

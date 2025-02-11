@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { showNotification } from '../utils/notifications';
+
 function SuppliersPage() {
   const [suppliers, setSuppliers] = useLocalStorage('suppliers', []);
+
+  // On mount, fetch the suppliers from the backend
+  useEffect(() => {
+    axios.get("http://localhost:8000/api/suppliers")
+      .then((res) => setSuppliers(res.data))
+      .catch((err) => console.error("Erreur fetching suppliers:", err));
+  }, [setSuppliers]);
+
   const [editingSupplier, setEditingSupplier] = useState(null);
 
   const handleSubmit = (e) => {
@@ -15,8 +25,22 @@ function SuppliersPage() {
       phone: form.supplierPhone.value.trim(),
       category: form.supplierCategory.value
     };
-    setSuppliers([...suppliers, newSupplier]);
-    form.reset();
+    axios.get("http://localhost:8000/sanctum/csrf-cookie", { withCredentials: true })
+      .then(() => {
+        axios
+          .post("http://localhost:8000/api/suppliers", newSupplier, { withCredentials: true })
+          .then(response => {
+            setSuppliers([...suppliers, response.data]);
+            form.reset();
+            showNotification('Fournisseur ajouté avec succès');
+          })
+          .catch(error => {
+            console.error("Erreur adding supplier:", error);
+          });
+      })
+      .catch(error => {
+        console.error("Erreur fetching CSRF cookie:", error);
+      });
   };
 
   const handleDelete = (id) => {
@@ -33,9 +57,16 @@ function SuppliersPage() {
     document.body.appendChild(modal);
   
     modal.querySelector('.confirm-btn').addEventListener('click', () => {
-      setSuppliers(suppliers.filter(s => s.id !== id));
-      showNotification('Fournisseur supprimé avec succès');
-      document.body.removeChild(modal);
+      axios.delete(`http://localhost:8000/api/suppliers/${id}`, { withCredentials: true })
+        .then(response => {
+          setSuppliers(suppliers.filter(s => s.id !== id));
+          showNotification('Fournisseur supprimé avec succès');
+          document.body.removeChild(modal);
+        })
+        .catch(error => {
+          console.error('Erreur deleting supplier:', error);
+          document.body.removeChild(modal);
+        });
     });
   
     modal.querySelector('.cancel-btn').addEventListener('click', () => {
@@ -100,8 +131,21 @@ function SuppliersPage() {
       phone: form.editSupplierPhone.value.trim(),
       category: form.editSupplierCategory.value
     };
-    setSuppliers(suppliers.map(s => (s.id === updatedSupplier.id ? updatedSupplier : s)));
-    setEditingSupplier(null);
+    axios.get("http://localhost:8000/sanctum/csrf-cookie", { withCredentials: true })
+      .then(() => {
+        axios.put(`http://localhost:8000/api/suppliers/${updatedSupplier.id}`, updatedSupplier, { withCredentials: true })
+          .then(response => {
+            setSuppliers(suppliers.map(s => (s.id === updatedSupplier.id ? response.data : s)));
+            setEditingSupplier(null);
+            showNotification('Fournisseur mis à jour avec succès');
+          })
+          .catch(error => {
+            console.error('Erreur updating supplier:', error);
+          });
+      })
+      .catch(error => {
+        console.error("Erreur fetching CSRF cookie:", error);
+      });
   };
 
   return (

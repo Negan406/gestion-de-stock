@@ -8,4 +8,9 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        proxy: {
+            '/api': 'http://127.0.0.1:8000', // Proxy all /api requests to the Laravel backend
+        },
+    },
 });

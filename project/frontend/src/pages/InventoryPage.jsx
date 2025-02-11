@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
-import useLocalStorage from '../hooks/useLocalStorage';
+import { useEffect, useState } from 'react';
 import { showNotification } from '../utils/notifications';
+import axios from "axios";
+import useLocalStorage from '../hooks/useLocalStorage';
+
 
 function InventoryPage() {
-  const [products, setProducts] = useLocalStorage('stock', []);
+  const [products, setProducts] = useLocalStorage('stock',[]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState(''); // State for category filter
+useEffect(() => {
+  axios.get("http://localhost:8000/api/inventories")
+    .then((res) => setProducts(res.data))
+    .catch((err) => console.error("Error fetching inventories:", err));
+}, [setProducts]);
 
   const handleDelete = (id) => {
     const modal = document.createElement('div');
@@ -21,9 +28,16 @@ function InventoryPage() {
     document.body.appendChild(modal);
   
     modal.querySelector('.confirm-btn').addEventListener('click', () => {
-      setProducts(products.filter(p => p.id !== id));
-      showNotification('Produit supprimé avec succès');
-      document.body.removeChild(modal);
+      axios.delete(`http://localhost:8000/api/inventories/${id}`, { withCredentials: true })
+        .then(response => {
+          setProducts(products.filter(p => p.id !== id));
+          showNotification('Produit supprimé avec succès');
+          document.body.removeChild(modal);
+        })
+        .catch(error => {
+          console.error('Erreur deleting produit:', error);
+          document.body.removeChild(modal);
+        });
     });
   
     modal.querySelector('.cancel-btn').addEventListener('click', () => {
@@ -89,9 +103,21 @@ function InventoryPage() {
       quantity: parseInt(form.editProductQuantity.value),
       lastModified: new Date().toISOString()
     };
-    setProducts(products.map(p => (p.id === updatedProduct.id ? updatedProduct : p)));
-    setEditingProduct(null);
-    showNotification('Produit mis à jour avec succès');
+    axios.get("http://localhost:8000/sanctum/csrf-cookie", { withCredentials: true })
+      .then(() => {
+        axios.put(`http://localhost:8000/api/inventories/${updatedProduct.id}`, updatedProduct, { withCredentials: true })
+          .then(response => {
+            setProducts(products.map(p => (p.id === updatedProduct.id ? response.data : p)));
+            setEditingProduct(null);
+            showNotification('Produit mis à jour avec succès');
+          })
+          .catch(error => {
+            console.error("Erreur updating produit:", error);
+          });
+      })
+      .catch(error => {
+        console.error("Erreur fetching CSRF cookie:", error);
+      });
   };
 
   const handleCategoryChange = (e) => {
@@ -108,7 +134,7 @@ function InventoryPage() {
       <section className="card" id="inventory">
         <div className="card-header bg-primary text-white">
           <h2 className="h5 mb-0">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive-fill" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-archive-fill" viewBox="0 0 16 16">
   <path d="M12.643 15C13.979 15 15 13.845 15 12.5V5H1v7.5C1 13.845 2.021 15 3.357 15zM5.5 7h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M.8 1a.8.8 0 0 0-.8.8V3a.8.8 0 0 0 .8.8h14.4A.8.8 0 0 0 16 3V1.8a.8.8 0 0 0-.8-.8z"/>
 </svg>  Inventaire
           </h2>
@@ -145,9 +171,9 @@ function InventoryPage() {
                   <tr key={product.id}>
                     <td>{product.name}</td>
                     <td>{product.category}</td>
-                    <td>{product.price.toFixed(2)} DH</td>
+                    <td>{product.price} DH</td>
                     <td>{product.quantity}</td>
-                    <td>{(product.price * product.quantity).toFixed(2)} DH</td>
+                    <td>{(product.price * product.quantity)} DH</td>
                     <td>
                       <button
                         onClick={() => handleEditClick(product)}
