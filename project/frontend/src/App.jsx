@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import DashboardPage from './pages/DashboardPage';
@@ -8,17 +8,24 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import ClientsPage from './pages/ClientsPage';
 import SuppliersPage from './pages/SuppliersPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import { RouteProvider } from './context/RouteContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {
+  const [user, setUser] = useState(null);
   const [isSidebarActive, setSidebarActive] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const authStatus = localStorage.getItem("isAuthenticated") === "true";
     setIsAuthenticated(authStatus);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
   const toggleSidebar = () => setSidebarActive(!isSidebarActive);
 
@@ -48,18 +55,20 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/register" element={<RegisterPage setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route
             path="/*"
             element={
               isAuthenticated ? (
                 <div className={`app ${isSidebarActive ? 'sidebar-active' : ''}`}>
                   <button className="hamburger btn btn-primary" onClick={toggleSidebar}>
-                  ☰
+                    ☰
                   </button>
-                  <Sidebar isActive={isSidebarActive} toggleSidebar={toggleSidebar} />
+                  <Sidebar isActive={isSidebarActive} toggleSidebar={toggleSidebar} setIsAuthenticated={setIsAuthenticated} />
                   <main className="main-content container my-5">
                     <Routes>
-                      <Route path="/dashboard" element={<DashboardPage />} />
+                      <Route path="/dashboard" element={<DashboardPage user={user} />} />
                       <Route path="/add-product" element={<AddProductPage />} />
                       <Route path="/inventory" element={<InventoryPage />} />
                       <Route path="/analytics" element={<AnalyticsPage />} />

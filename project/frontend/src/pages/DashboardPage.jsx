@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Chart from 'chart.js/auto';
 import useLocalStorage from '../hooks/useLocalStorage';
 
-function DashboardPage() {
+function DashboardPage({ user }) {
   const [products] = useLocalStorage('stock', []);
   const [refreshKey, setRefreshKey] = useState(0);
   const [chart, setChart] = useState(null);

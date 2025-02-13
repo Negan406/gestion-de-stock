@@ -564,7 +564,7 @@ body.dark-mode #users-page .text-muted {
   margin-top: 10px;
   position: relative;
   bottom: 35px;
-  height: 90px;
+  height: 120px;
 }
 
 .btn2 {
@@ -585,6 +585,38 @@ body.dark-mode #users-page .text-muted {
 .tb{
   position: relative;
   top: 10px;
+}
+.loginr-page-container{
+  position: relative;
+  left: 210px;
+}
+.logor-container{
+  position: relative;
+  bottom: 20px;
+}
+.forgot-password-container{
+  position: relative;
+  left: 550px;
+
+}
+.forgot-password-box{
+  background-color: rgba(160, 137, 122, 0.651);
+  width: 400px;
+  height: 350px;
+  border-radius: 10px;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+.login-page-container {
+  background: url("pexels-tiger-lily-4481260.jpg") no-repeat center center fixed;
+  background-size: cover;
+  width: 2000px;
+}
+.login-page {
+  position: relative;
+  left: 230px;
+}
+.login-box{
+  background-color: rgba(169, 134, 113, 0.925);
 }
 
 

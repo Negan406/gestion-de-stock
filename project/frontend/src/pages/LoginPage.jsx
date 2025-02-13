@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from './Screenshot_2025-02-08_155703-removebg.png';
 
@@ -14,21 +14,34 @@ const LoginPage = ({ setIsAuthenticated }) => {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:8000/api/login', { // adjust the URL/port as needed
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // Check if email or password is incorrect
-    if (email !== "Essalmi14@gmail.com") {
-      setErrorMessage("Email incorrect !");
-      setTimeout(() => setErrorMessage(''), 3000); 
-    } else if (password !== "123456") {
-      setErrorMessage("Mot de passe incorrect !");
-      setTimeout(() => setErrorMessage(''), 3000); 
-    } else {
-      localStorage.setItem("isAuthenticated", "true");
-      setIsAuthenticated(true);
-      const username = email.split('@')[0];
-      navigate(`/dashboard?user=${encodeURIComponent(username)}`);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setIsAuthenticated(true);
+        // Use the returned user's name or derive it from email
+        const username = data.user.name || email.split('@')[0];
+        navigate(`/dashboard?user=${encodeURIComponent(username)}`);
+      } else {
+        setErrorMessage(data.message || 'Login failed');
+        setTimeout(() => setErrorMessage(''), 3000);
+      }
+    } catch (error) {
+      setErrorMessage('An error occurred. Please try again.');
+      setTimeout(() => setErrorMessage(''), 3000);
     }
   };
 
@@ -39,14 +52,7 @@ const LoginPage = ({ setIsAuthenticated }) => {
 
   return (
     <div className="login-page-container">
-      <div
-        className="login-page d-flex align-items-center justify-content-center min-vh-100"
-        style={{
-          position: 'relative',
-          left: '450px',
-          width: '600px',
-        }}
-      >
+      <div className="login-page d-flex align-items-center justify-content-center min-vh-100">
         <div className="login-box">
           <div className="text-center mb-4">
             <div id='imm' className="logo-container mb-3">
@@ -83,13 +89,18 @@ const LoginPage = ({ setIsAuthenticated }) => {
               </button>
             </div>
             <div className="text-end mb-3">
-              <a href="#" className="text-muted" style={{ textDecoration: 'none' }}>
+              <Link to="/forgot-password" style={{color: 'white'}}>
                 Mot de passe oublié ?
-              </a>
+              </Link>
             </div>
 
             <button type="submit" className="btn btn-primary w-100 mb-3">Se connecter</button>
           </form>
+
+          <div className="text-center">
+            <span>Vous n'avez pas de compte ? </span>
+            <Link to="/register"  style={{color: 'white'}}>Créer un compte</Link>
+          </div>
         </div>
       </div>
       {errorMessage && (

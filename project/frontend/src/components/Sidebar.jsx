@@ -1,16 +1,20 @@
-import React from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import ThemeSwitcher from './ThemeSwitcher';
+import { NavLink, useNavigate } from 'react-router-dom';
 import ProImage from './pro.jpg';
+import PropTypes from 'prop-types';
 
-function Sidebar({ isActive, toggleSidebar }) {
+function Sidebar({ isActive, toggleSidebar, setIsAuthenticated }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const username = params.get("user") || "Admin";
+  const storedUser = localStorage.getItem("user");
+  const userData = storedUser ? JSON.parse(storedUser) : null;
+  const username = userData?.name || "Admin";
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    navigate("/login");
+    // Optionally remove the confirmation dialog if you want immediate logout:
+    if (window.confirm("Are you sure you want to logout?")) {
+      localStorage.removeItem("isAuthenticated");
+      localStorage.removeItem("user");
+      setIsAuthenticated(false);
+      navigate("/login");
+    }
   };
   return (
     <nav className={`sidebar bg-dark text-white pt-3 ${isActive ? 'active' : ''}`}>
@@ -24,7 +28,7 @@ function Sidebar({ isActive, toggleSidebar }) {
       <ul className="nav flex-column">
         <li className="nav-item">
           <NavLink to="/dashboard" className="nav-link" onClick={toggleSidebar}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-speedometer" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-speedometer" viewBox="0 0 16 16">
   <path d="M8 2a.5.5 0 0 1 .5.5V4a.5.5 0 0 1-1 0V2.5A.5.5 0 0 1 8 2M3.732 3.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 8a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 8m9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5m.754-4.246a.39.39 0 0 0-.527-.02L7.547 7.31A.91.91 0 1 0 8.85 8.569l3.434-4.297a.39.39 0 0 0-.029-.518z"/>
   <path fillRule="evenodd" d="M6.664 15.889A8 8 0 1 1 9.336.11a8 8 0 0 1-2.672 15.78zm-4.665-4.283A11.95 11.95 0 0 1 8 10c2.186 0 4.236.585 6.001 1.606a7 7 0 1 0-12.002 0"/>
 </svg> Dashboard
@@ -96,5 +100,11 @@ function Sidebar({ isActive, toggleSidebar }) {
     </nav>
   );
 }
+
+Sidebar.propTypes = {
+  isActive: PropTypes.bool.isRequired,
+  toggleSidebar: PropTypes.func.isRequired,
+  setIsAuthenticated: PropTypes.func.isRequired,
+};
 
 export default Sidebar;
