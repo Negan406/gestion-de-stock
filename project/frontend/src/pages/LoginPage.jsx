@@ -17,7 +17,7 @@ const LoginPage = ({ setIsAuthenticated }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/login', { // adjust the URL/port as needed
+      const response = await fetch('http://localhost:8000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,11 +28,12 @@ const LoginPage = ({ setIsAuthenticated }) => {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok && data.token) {
+        // Save the token for token-based authentication
+        localStorage.setItem("authToken", data.token);
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("user", JSON.stringify(data.user));
         setIsAuthenticated(true);
-        // Use the returned user's name or derive it from email
         const username = data.user.name || email.split('@')[0];
         navigate(`/dashboard?user=${encodeURIComponent(username)}`);
       } else {

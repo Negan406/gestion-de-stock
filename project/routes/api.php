@@ -15,8 +15,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 });
-
-// Move the login and register routes outside the sanctum middleware
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']); 

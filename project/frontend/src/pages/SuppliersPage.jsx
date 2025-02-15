@@ -3,6 +3,15 @@ import axios from 'axios';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { showNotification } from '../utils/notifications';
 
+// Configure token-based authentication
+const token = localStorage.getItem('authToken');
+
+if (token) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+} else {
+  console.error("No auth token found. Please log in.");
+}
+
 function SuppliersPage() {
   const [suppliers, setSuppliers] = useLocalStorage('suppliers', []);
 
